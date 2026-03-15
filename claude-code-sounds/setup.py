@@ -20,31 +20,20 @@ def main():
         if play_script.exists():
             play_script.chmod(play_script.stat().st_mode | 0o111)
 
-    print("Which mode?")
-    print("  1) Random sound on every notification")
-    print("  2) Context-aware (different sounds for success/error/other)")
-
-    while True:
-        try:
-            choice = input("Choice [1/2]: ").strip()
-            if choice in ('1', '2'):
-                break
-        except (EOFError, KeyboardInterrupt):
-            print("\nAborted.")
-            sys.exit(1)
-
     # Build the command cross-platform
     py_bin = "python" if sys.platform == "win32" else "python3"
-    cmd = f'{py_bin} "{script_dir / "play.py"}"'
-
-    if choice == '2':
-        cmd += ' --context'
+    play = f'{py_bin} "{script_dir / "play.py"}"'
 
     hooks_config = {
         "hooks": {
-            "Notification": [
+            "UserPromptSubmit": [
                 {
-                    "command": cmd
+                    "command": f'{play} --event start'
+                }
+            ],
+            "Stop": [
+                {
+                    "command": f'{play} --event done'
                 }
             ]
         }
@@ -72,9 +61,9 @@ def main():
             sys.exit(1)
 
         # Safely Merge
-        settings.setdefault("hooks", {}).setdefault("Notification", []).append(
-            hooks_config["hooks"]["Notification"][0]
-        )
+        hooks = settings.setdefault("hooks", {})
+        for event, entries in hooks_config["hooks"].items():
+            hooks.setdefault(event, []).extend(entries)
 
         with open(settings_file, "w") as f:
             json.dump(settings, f, indent=2)
