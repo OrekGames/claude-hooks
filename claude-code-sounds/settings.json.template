@@ -2,12 +2,12 @@
   "hooks": {
     "UserPromptSubmit": [
       {
-        "command": "python3 \"/ABSOLUTE/PATH/TO/claude-code-sounds/play.py\" --event start"
+        "command": "python3 \"/Users/YOUR_USERNAME/.claude/claude-code-sounds/play.py\" --event start"
       }
     ],
     "Stop": [
       {
-        "command": "python3 \"/ABSOLUTE/PATH/TO/claude-code-sounds/play.py\" --event done"
+        "command": "python3 \"/Users/YOUR_USERNAME/.claude/claude-code-sounds/play.py\" --event done"
       }
     ]
   }

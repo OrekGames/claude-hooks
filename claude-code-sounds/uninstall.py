@@ -1,49 +1,60 @@
 #!/usr/bin/env python3
 import json
+import shutil
 import sys
 from pathlib import Path
 
+INSTALL_DIR = Path.home() / ".claude" / "claude-code-sounds"
+SETTINGS_FILE = Path.home() / ".claude" / "settings.json"
+
 def main():
-    settings_file = Path.home() / ".claude" / "settings.json"
+    print(f"Removing sound notification hooks from {SETTINGS_FILE}...\n")
 
-    print(f"Removing sound notification hooks from {settings_file}...\n")
+    if SETTINGS_FILE.exists():
+        try:
+            with open(SETTINGS_FILE) as f:
+                settings = json.load(f)
+        except json.JSONDecodeError:
+            print("Error parsing settings.json.")
+            sys.exit(1)
 
-    if not settings_file.exists():
-        print("No settings file found. Nothing to do.")
-        return
+        hooks = settings.get("hooks", {})
+        changed = False
+        for event in ("UserPromptSubmit", "Stop"):
+            if event in hooks:
+                before = len(hooks[event])
+                hooks[event] = [
+                    h for h in hooks[event]
+                    if "play.py" not in str(h.get("command", ""))
+                ]
+                if len(hooks[event]) < before:
+                    changed = True
+                if not hooks[event]:
+                    del hooks[event]
 
-    try:
-        with open(settings_file, "r") as f:
-            settings = json.load(f)
-    except json.JSONDecodeError:
-        print("Error parsing settings.json.")
-        sys.exit(1)
+        if not hooks:
+            settings.pop("hooks", None)
 
-    if "hooks" in settings and "Notification" in settings["hooks"]:
-        original_count = len(settings["hooks"]["Notification"])
-
-        # Keep hooks that don't belong to our script
-        settings["hooks"]["Notification"] = [
-            hook for hook in settings["hooks"]["Notification"]
-            if "command" not in hook or "play.py" not in str(hook["command"])
-        ]
-
-        # Cleanup empty sections
-        if not settings["hooks"]["Notification"]:
-            del settings["hooks"]["Notification"]
-        if not settings["hooks"]:
-            del settings["hooks"]
-
-        if "hooks" not in settings or len(settings.get("hooks", {}).get("Notification", [])) < original_count:
-            with open(settings_file, "w") as f:
+        if changed:
+            with open(SETTINGS_FILE, "w") as f:
                 json.dump(settings, f, indent=2)
-            print("Hooks removed successfully.")
+            print("Hooks removed from settings.json.")
         else:
-            print("No matching hooks found.")
+            print("No matching hooks found in settings.json.")
     else:
-        print("No hooks to remove.")
+        print("No settings file found.")
 
-    print("Done. Restart Claude Code for changes to take effect.")
+    if INSTALL_DIR.exists():
+        try:
+            confirm = input(f"\nRemove install directory {INSTALL_DIR}? [y/N]: ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            confirm = "n"
+
+        if confirm in ("y", "yes"):
+            shutil.rmtree(INSTALL_DIR)
+            print(f"Removed {INSTALL_DIR}")
+
+    print("\nDone. Restart Claude Code for changes to take effect.")
 
 if __name__ == "__main__":
     main()
