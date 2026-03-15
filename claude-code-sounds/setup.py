@@ -16,14 +16,16 @@ def install(script_dir, install_dir, settings_file, use_relative=False):
     print(f"Installing to {install_dir} ...")
     install_dir.mkdir(parents=True, exist_ok=True)
 
-    shutil.copy2(script_dir / "play.py", install_dir / "play.py")
+    # Skip file copy if script is already in the install location
+    if script_dir.resolve() != install_dir.resolve():
+        shutil.copy2(script_dir / "play.py", install_dir / "play.py")
 
-    sounds_dst = install_dir / "sounds"
-    sounds_src = script_dir / "sounds"
-    if sounds_src.exists():
-        if sounds_dst.exists():
-            shutil.rmtree(sounds_dst)
-        shutil.copytree(sounds_src, sounds_dst)
+        sounds_dst = install_dir / "sounds"
+        sounds_src = script_dir / "sounds"
+        if sounds_src.exists():
+            if sounds_dst.exists():
+                shutil.rmtree(sounds_dst)
+            shutil.copytree(sounds_src, sounds_dst)
 
     if sys.platform != "win32":
         (install_dir / "play.py").chmod(0o755)
