@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/Users/YOUR_USERNAME/.claude/claude-code-sounds/play.py\" --event start"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/Users/YOUR_USERNAME/.claude/claude-code-sounds/play.py\" --event done"
+          }
+        ]
+      }
+    ]
+  }
+}
