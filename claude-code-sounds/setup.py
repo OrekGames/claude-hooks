@@ -95,8 +95,14 @@ def main():
         install_dir   = Path.home() / ".claude" / "claude-code-sounds"
         settings_file = Path.home() / ".claude" / "settings.json"
     else:
-        # Local: install relative to cwd (the project root)
-        project_root  = Path.cwd()
+        # Local: install relative to the project root.
+        # If the script is already inside a .claude/claude-code-sounds/ directory
+        # (e.g. user copied the folder into their project's .claude/ and ran setup
+        # from there), derive the project root from script_dir.
+        if script_dir.parent.name == ".claude":
+            project_root = script_dir.parent.parent
+        else:
+            project_root = Path.cwd()
         install_dir   = project_root / ".claude" / "claude-code-sounds"
         settings_file = project_root / ".claude" / "settings.json"
 
