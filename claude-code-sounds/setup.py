@@ -12,7 +12,7 @@ def ask(prompt, default=""):
         return default
 
 
-def install(script_dir, install_dir, settings_file):
+def install(script_dir, install_dir, settings_file, use_relative=False):
     print(f"Installing to {install_dir} ...")
     install_dir.mkdir(parents=True, exist_ok=True)
 
@@ -29,11 +29,15 @@ def install(script_dir, install_dir, settings_file):
         (install_dir / "play.py").chmod(0o755)
 
     py_bin = "python" if sys.platform == "win32" else "python3"
-    play_cmd = f'{py_bin} "{install_dir / "play.py"}"'
+    if use_relative:
+        play_path = ".claude/claude-code-sounds/play.py"
+    else:
+        play_path = str(install_dir / "play.py")
+    play_cmd = f'{py_bin} "{play_path}"'
 
     new_hooks = {
-        "UserPromptSubmit": [{"hooks": [{"type": "command", "command": f"{play_cmd} --event start"}]}],
-        "Stop":             [{"hooks": [{"type": "command", "command": f"{play_cmd} --event done"}]}],
+        "UserPromptSubmit": [{"matcher": "", "hooks": [{"type": "command", "command": f"{play_cmd} --event start"}]}],
+        "Stop":             [{"matcher": "", "hooks": [{"type": "command", "command": f"{play_cmd} --event done"}]}],
     }
 
     if settings_file.exists():
@@ -96,7 +100,7 @@ def main():
         install_dir   = project_root / ".claude" / "claude-code-sounds"
         settings_file = project_root / ".claude" / "settings.json"
 
-    install(script_dir, install_dir, settings_file)
+    install(script_dir, install_dir, settings_file, use_relative=not global_mode)
 
     print("Done! Sound notifications are now active.")
     print("Restart Claude Code for hooks to take effect.")

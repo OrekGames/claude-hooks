@@ -2,20 +2,22 @@
   "hooks": {
     "UserPromptSubmit": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"/Users/david/Workspaces/OrekGames/claude-hooks/.claude/claude-code-sounds/play.py\" --event start"
+            "command": "python3 \".claude/claude-code-sounds/play.py\" --event start"
           }
         ]
       }
     ],
     "Stop": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"/Users/david/Workspaces/OrekGames/claude-hooks/.claude/claude-code-sounds/play.py\" --event done"
+            "command": "python3 \".claude/claude-code-sounds/play.py\" --event done"
           }
         ]
       }
