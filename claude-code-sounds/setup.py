@@ -55,6 +55,15 @@ def install(script_dir, install_dir, settings_file):
 
         hooks = settings.setdefault("hooks", {})
         for event, entries in new_hooks.items():
+            # Remove any existing claude-code-sounds entries first (idempotent)
+            if event in hooks:
+                hooks[event] = [
+                    h for h in hooks[event]
+                    if not any(
+                        "claude-code-sounds" in str(c.get("command", ""))
+                        for c in h.get("hooks", [])
+                    )
+                ]
             hooks.setdefault(event, []).extend(entries)
     else:
         settings = {"hooks": new_hooks}
