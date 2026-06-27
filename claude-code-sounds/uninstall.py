@@ -4,15 +4,9 @@ import json
 import shutil
 import sys
 from pathlib import Path
+from utils import ask
 
 HOOK_MARKER = "claude-code-sounds"
-
-
-def ask(prompt, default=""):
-    try:
-        return input(prompt).strip().lower() or default
-    except (EOFError, KeyboardInterrupt):
-        return default
 
 
 def is_managed_hook(hook):

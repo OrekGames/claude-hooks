@@ -4,6 +4,7 @@ import json
 import shutil
 import sys
 from pathlib import Path
+from utils import ask
 
 AUDIO_EXTS = {".mp3", ".wav", ".m4a"}
 HOOK_MARKER = "claude-code-sounds"
@@ -16,13 +17,6 @@ LEGACY_DEFAULTS = (
     Path("sounds/start/Zugg Zugg.m4a"),
     Path("sounds/done/Jobs Done.m4a"),
 )
-
-
-def ask(prompt, default=""):
-    try:
-        return input(prompt).strip().lower() or default
-    except (EOFError, KeyboardInterrupt):
-        return default
 
 
 def is_managed_hook(hook):
